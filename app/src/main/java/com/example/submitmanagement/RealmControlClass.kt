@@ -35,7 +35,7 @@ class RealmControl(
     }
 
     /**
-     * コンストラクタに代入された[Submit]に基づき、データベースへレコード挿入する処理を開始します。
+     * コンストラクタに代入された[Submit]に基づき、データベースのトランザクションを開始します。
      */
     fun controlSubmitDB(){
         realm.executeTransaction{ realm
