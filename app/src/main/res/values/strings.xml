@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">submitManagement</string>
+    <string name="resisterSubmit">提出物登録</string>
+    <string name="subject">講義名</string>
+    <string name="subjectExample">講義名をここに入力</string>
+    <string name="submitTermDay">期限(年,月,日)</string>
+    <string name="submitTermDayButton">カレンダーから選択</string>
+    <string name="submitTermHourButton">時間を選択</string>
+    <string name="submitTermHour">期限(時,分)</string>
+    <string name="stillChoice">まだ選択されていません。</string>
+    <string name="stillEnter">まだ入力されていません。</string>
+    <string name="remarks">備考</string>
+    <string name="remarksExample">備考があればここへ</string>
+    <string name="submitResisterComplete">登録</string>
+    <string name="returnScene">戻る</string>
+    <string name="submitContents">提出物内容</string>
+    <string name="submitContentsExample">提出物の内容を入力</string>
+    <string name="nullText">NULL</string>
+    <string name="submitTermAll">期限</string>
+</resources>
