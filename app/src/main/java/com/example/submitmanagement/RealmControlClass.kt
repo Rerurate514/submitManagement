@@ -1,5 +1,6 @@
 package com.example.submitmanagement
 
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import io.realm.Realm
 import io.realm.RealmObject
@@ -35,7 +36,7 @@ class RealmControl(
     }
 
     /**
-     * コンストラクタに代入された[Submit]に基づき、データベースへレコード挿入する処理を開始します。
+     * コンストラクタに代入された[Submit]に基づき、データベースのトランザクションを開始します。
      */
     fun controlSubmitDB(){
         realm.executeTransaction{ realm
@@ -193,6 +194,11 @@ class RealmControl(
         )
     }
 
+    /**
+     * DBが存在するか確認するメソッド
+     *
+     * @return nullなら存在しない, null以外なら存在する
+     */
     private fun isRealmNull(): Int? {
         val minId = 0
         return realm.where(SubmitDB::class.java)
@@ -201,14 +207,64 @@ class RealmControl(
             ?.id
     }
 
-    private fun deleteRealmObject(id: Int){
+    /**
+     * DB内にnullが存在するか確認するメソッド
+     *
+     * @return nullのid, 返り値がnullならDB内にnullが存在しない
+     */
+    private fun isRealmNullInRecord(): Int?{
+        if(isRealmNull() == null) return null
+        var nullObj : RealmObject?
+        var nullId : Int? = null
+
+        for(i in 0..getRealmMax()){
+            nullObj = realm.where(SubmitDB::class.java)
+                .equalTo(ID,i)
+                .findFirst()
+
+            nullId = i
+            if(nullObj == null) break
+        }
+        return nullId
+    }
+
+    fun deleteRealmObject(id: Int){
         realm.executeTransaction { realm
             realm.where(SubmitDB::class.java)
                 .equalTo(ID, id)
                 .findFirst()?.deleteFromRealm()
         }
+        alignRealmObject()
     }
 
+    /**
+     * DBの中のnullを見つけて詰めるメソッドです。
+     */
+    private fun alignRealmObject() {
+        val nullId = isRealmNullInRecord() ?: return
+
+        createRecord(nullId)
+
+        for(i in nullId until getRealmMax()){
+            val removeObj = realm.where(SubmitDB::class.java)
+                .equalTo(ID,i)
+                .findFirst()!!
+
+            val moveObj = realm.where(SubmitDB::class.java)
+                .equalTo(ID,i + 1)
+                .findFirst()!!
+
+            val moveObjSubmit = Submit(
+                moveObj.submitName,
+                moveObj.submitContents,
+                moveObj.submitTerm,
+                moveObj.remarks,
+                moveObj.anyBitmaps
+            )
+
+            RealmObjectMove(moveObjSubmit,removeObj).realmReplace()
+        }
+    }
 
     /**
      * データベース [SubmitDB] のテーブルを全て消去します。
@@ -240,7 +296,6 @@ class RealmControl(
         override var bitmap: ByteArray? = beforeData.bitmap
 
         fun realmReplace(){
-            mAPI.logTest("replace success ${afterObj.submitTerm} <- ${submitTerm}")
             afterObj.submitName = submitName
             afterObj.submitContents = submitContents
             afterObj.submitTerm = submitTerm

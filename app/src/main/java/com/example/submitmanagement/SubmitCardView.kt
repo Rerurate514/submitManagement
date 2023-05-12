@@ -2,14 +2,10 @@ package com.example.submitmanagement
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.graphics.Canvas
 import android.graphics.Color
-import android.graphics.Paint
 import android.util.AttributeSet
 import android.view.Gravity
-import android.view.LayoutInflater
 import android.view.MotionEvent
-import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.ImageView
@@ -17,13 +13,17 @@ import android.widget.LinearLayout
 import android.widget.Space
 import android.widget.TextView
 import androidx.cardview.widget.CardView
-import androidx.core.view.marginStart
 import androidx.core.view.setMargins
 import java.security.SecureRandom
-import kotlin.random.Random
 
 @SuppressLint("InflateParams", "ViewConstructor")
-class SubmitCardView(context: Context, attrs: AttributeSet?, _submitData : Submit): CardView(context, attrs), SubmitDBInterface {
+class SubmitCardView(
+    context: Context,
+    attrs: AttributeSet?,
+    _submitData : Submit,
+    _id : Int
+): CardView(context, attrs), SubmitDBInterface {
+    private val id : Int = _id
     private var submitData: Submit = _submitData
     override var submitName: String = submitData.submitName
     override var submitContents: String = submitData.submitContents
@@ -32,6 +32,8 @@ class SubmitCardView(context: Context, attrs: AttributeSet?, _submitData : Submi
     override var bitmap: ByteArray? = submitData.bitmap
     private var termDay : String = submitData.getYMD()
     private var termHour : String = submitData.getHM()
+
+    private val mRealm = RealmControl()
 
     companion object{
         const val MARGIN = 12
@@ -246,6 +248,9 @@ class SubmitCardView(context: Context, attrs: AttributeSet?, _submitData : Submi
         headerLinear.setBackgroundColor(randomColor())
 
         textParams.setMargins(MARGIN)
+
+        editButton.setOnClickListener { editButtonTap() }
+        submitCompleteButton.setOnClickListener { completeButtonTap() }
     }
 
     fun generateView(){
@@ -293,5 +298,11 @@ class SubmitCardView(context: Context, attrs: AttributeSet?, _submitData : Submi
         return Color.rgb(random.nextInt(max),random.nextInt(max),random.nextInt(max))
     }
 
+    private fun editButtonTap(){
 
+    }
+
+    private fun completeButtonTap(){
+        mRealm.deleteRealmObject(id)
+    }
 }
