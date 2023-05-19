@@ -12,7 +12,7 @@ class RealmInitClass : Application(){
         super.onCreate()
         Realm.init(this)
         val config = RealmConfiguration.Builder().allowWritesOnUiThread(true)
-            .deleteRealmIfMigrationNeeded()
+            //.deleteRealmIfMigrationNeeded()
             .directory(File("/data/data/com.example.submitmanagement/files/"))
             .build()
         Realm.setDefaultConfiguration(config)
